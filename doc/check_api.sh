@@ -1,43 +1,51 @@
 #!/bin/sh
 
-ls ./dox_comments/header_files/ |
-while read h_file; do
-    grep -P -h -z -o 'WOLFSSL_API(\n|\s|[^;])*;' ./dox_comments/header_files/$h_file |
-    tr '\n' ' ' |
-    sed 's/\\n//g' |
-    sed 's/ \+/ /g' |
-    sed 's/\x00/\n/g' > dox_api.txt
+DOX_PATH="./dox_comments/header_files"
+WOLFSSL_PATH="../wolfssl"
+WOLFCRYPT_PATH="$WOLFSSL_PATH/wolfcrypt"
+OPENSSL_PATH="$WOLFSSL_PATH/openssl"
+API_STRIP='/^ *WOLFSSL_API/ {
+			:a
+			/;/ {
+				y/\n/ /
+				s/^ *//
+				s/ \{1,\}/ /g
+				s/( /(/g
+				p
+				d
+			}
+			N
+			b a
+		}'
 
-    find ../ -not -path '../doc/*' -name $h_file |
-    while read -r h_file_path; do
-        echo "Checking: $h_file_path"
-        grep -P -h -z -o 'WOLFSSL_API(\n|\s|[^;])*;' "$h_file_path" |
-        sed 's/#.*/ /g' |
-        tr '\n' ' ' |
-        sed 's/\\n//g' |
-        sed 's/ \+/ /g' |
-        sed 's/\x00/\n/g' > wolf_api.txt
+for h_file in "$DOX_PATH"/*
+do
+	h_file=$(basename "$h_file")
+	sed -n "$API_STRIP" "$DOX_PATH/$h_file" > dox_api.txt
 
-        api_count="$(wc -l < dox_api.txt)"
-        match_count="$(grep -Ff dox_api.txt wolf_api.txt | wc -l)"
-        if [ "$api_count" != "$match_count" ]; then
-            echo "Mistmatch"
-            echo "Dox_api: $api_count"
-            echo "Matched_api: $match_count"
-            echo "Header file: $h_file"
-            echo "Check API: "
-            sort dox_api.txt -o dox_api.txt
-            sort wolf_api.txt -o wolf_api.txt
-            comm -23 dox_api.txt wolf_api.txt
-            exit 1
-        else
-            echo "$h_file is all good"
-            break
-        fi
-    done || exit 1
-    echo 'Next...\n'
+	if test -f "$WOLFSSL_PATH/$h_file"; then
+		h_file_path="$WOLFSSL_PATH/$h_file"
+	elif test -f "$WOLFCRYPT_PATH/$h_file"; then
+		h_file_path="$WOLFCRYPT_PATH/$h_file"
+	elif test -f "$OPENSSL_PATH/$h_file"; then
+		h_file_path="$OPENSSL_PATH/$h_file"
+	else
+		continue
+	fi
 
-done || exit 1
+	sed -n "$API_STRIP" "$h_file_path" > wolf_api.txt
 
-rm dox_api.txt
-rm wolf_api.txt
+    sort dox_api.txt -o dox_api_sorted.txt
+    sort wolf_api.txt -o wolf_api_sorted.txt
+	common=$(comm -3 dox_api_sorted.txt wolf_api_sorted.txt)
+	if test ! -z "$common"
+	then
+		echo file "$h_file"
+		echo "$common"
+	fi
+done
+
+rm -f dox_api.txt
+rm -f dox_api_sorted.txt
+rm -f wolf_api.txt
+rm -f wolf_api_sorted.txt
