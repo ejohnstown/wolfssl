@@ -4328,10 +4328,7 @@ WOLFSSL_LOCAL int wolfSSL_GetMaxRecordSize(WOLFSSL* ssl, int maxFragment);
                                                              DecodedCert* cert);
     #endif
 
-    WOLFSSL_LOCAL Signer* GetCA(void* cm, byte* hash);
-    #ifndef NO_SKID
-        WOLFSSL_LOCAL Signer* GetCAByName(void* cm, byte* hash);
-    #endif
+    WOLFSSL_LOCAL Signer* GetCA(void* cm, byte* nameHash, byte* keyIdHash);
 #endif /* !NO_CERTS */
 WOLFSSL_LOCAL int  BuildTlsHandshakeHash(WOLFSSL* ssl, byte* hash,
                                    word32* hashLen);

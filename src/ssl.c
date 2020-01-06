@@ -4553,7 +4553,7 @@ int MatchTrustedPeer(TrustedPeerCert* tp, DecodedCert* cert)
 
 
 /* return CA if found, otherwise NULL */
-Signer* GetCA(void* vp, byte* hash)
+Signer* GetCA(void* vp, byte* nameHash, byte* keyIdHash)
 {
     WOLFSSL_CERT_MANAGER* cm = (WOLFSSL_CERT_MANAGER*)vp;
     Signer* ret = NULL;
