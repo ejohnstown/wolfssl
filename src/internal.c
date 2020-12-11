@@ -13274,6 +13274,10 @@ static int DoDtlsHandShakeMsg(WOLFSSL* ssl, byte* input, word32* inOutIdx,
         }
     }
 
+    if (ssl->options.connectState == SECOND_REPLY_DONE) {
+        ignoreFinished = 1;
+    }
+
     /* Check the handshake sequence number first. If out of order,
      * add the current message to the list. If the message is in order,
      * but it is a fragment, add the current message to the list, then
