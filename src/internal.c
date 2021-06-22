@@ -14036,6 +14036,21 @@ static int DoDtlsHandShakeMsg(WOLFSSL* ssl, byte* input, word32* inOutIdx,
         }
     }
 
+    /* The client hello message received by the server must have a handshake
+     * message sequence number of 0 only. If this is the second client_hello,
+     * it must be 1. */
+    if (type == client_hello && ssl->options.side == WOLFSSL_SERVER_END &&
+            ((ssl->keys.dtls_peer_handshake_number == 0 &&
+              ssl->options.handShakeState != NULL_STATE) ||
+             (ssl->keys.dtls_peer_handshake_number == 1 &&
+              ssl->options.handShakeState >
+                    SERVER_HELLOVERIFYREQUEST_COMPLETE) ||
+             (ssl->keys.dtls_peer_handshake_number > 1)))
+    {
+        WOLFSSL_MSG("Client hello message is out of order");
+        return SEQUENCE_ERROR;
+    }
+
     /* Check the handshake sequence number first. If out of order,
      * add the current message to the list. If the message is in order,
      * but it is a fragment, add the current message to the list, then
