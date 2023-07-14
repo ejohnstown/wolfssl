@@ -1,0 +1,34 @@
+/** EXTENSIONS OPTIONS *******************************************************/
+
+/* Enable all TLS Extensions */
+#undef HAVE_TLS_EXTENSIONS
+
+
+/** TLS v1.3 OPTIONS *********************************************************/
+ 
+/* Enable wolfSSL TLS v1.3 */
+#undef WOLFSSL_TLS13
+
+/* Enable wolfSSL Post-handshake Authentication */
+#undef WOLFSSL_POST_HANDSHAKE_AUTH
+
+/* Enable server to send Cookie Extension in HRR with state */
+#undef WOLFSSL_SEND_HRR_COOKIE
+
+
+/** FIPS OPTIONS *************************************************************/
+
+/* Enable FIPS mode. */
+#undef HAVE_FIPS
+
+/* FIPS major version. */
+#undef HAVE_FIPS_VERSION
+
+/* FIPS minor version. */
+#undef HAVE_FIPS_VERSION_MINOR
+
+
+/** ALGORITHM OPTIONS ********************************************************/
+
+/* Disable RSA. */
+#undef NO_RSA

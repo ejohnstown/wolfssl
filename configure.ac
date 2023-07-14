@@ -30,7 +30,7 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 AC_ARG_PROGRAM
 
-AC_CONFIG_HEADERS([config.h:config.in])
+AC_CONFIG_HEADERS([config.h:config.in wolfssl/user_settings.h])
 
 LT_PREREQ([2.4.2])
 LT_INIT([disable-static win32-dll])
@@ -1280,6 +1280,7 @@ then
         ENABLED_TLS13_POST_AUTH="no"
     else
         AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_POST_HANDSHAKE_AUTH"
+        AC_DEFINE([WOLFSSL_POST_HANDSHAKE_AUTH],[],[Enable wolfSSL Post-handshake Authentication])
     fi
 fi
 
@@ -1298,6 +1299,7 @@ then
         ENABLED_SEND_HRR_COOKIE="no"
     else
         AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_SEND_HRR_COOKIE"
+        AC_DEFINE([WOLFSSL_SEND_HRR_COOKIE],[],[Enable server to send Cookie Extension in HRR with state])
     fi
 fi
 
@@ -4035,6 +4037,7 @@ AC_ARG_ENABLE([rsa],
 
 if test "$ENABLED_RSA" = "no"
 then
+    AC_DEFINE([NO_RSA],[],[Disable RSA.])
     AM_CFLAGS="$AM_CFLAGS -DNO_RSA"
 else
     # turn off RSA if leanpsk or leantls on
@@ -4542,7 +4545,10 @@ fi
 # FIPS feature and macro setup
 AS_CASE([$FIPS_VERSION],
     [v5*|ready|dev], [ # FIPS 140-3
-
+        AC_DEFINE([HAVE_FIPS],[],[Enable FIPS mode.])
+        AC_DEFINE([HAVE_FIPS_VERSION],[$HAVE_FIPS_VERSION],[FIPS major version.])
+        AC_DEFINE([HAVE_FIPS_VERSION_MINOR],[$HAVE_FIPS_VERSION_MINOR],[FIPS minor version.])
+        AC_DEFINE([HAVE_ECC_CDH],[],[Enable cofactor ECDHE.])
         AM_CFLAGS="$AM_CFLAGS \
             -DHAVE_FIPS \
             -DHAVE_FIPS_VERSION=$HAVE_FIPS_VERSION \
@@ -5384,6 +5390,8 @@ fi
 if test "$ENABLED_TLS13" = "yes"
 then
     AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_TLS13 -DHAVE_TLS_EXTENSIONS"
+    AC_DEFINE([WOLFSSL_TLS13],[],[Enable wolfSSL TLS v1.3])
+    AC_DEFINE([HAVE_TLS_EXTENSIONS],[],[Enable all TLS Extensions])
 fi
 
 
