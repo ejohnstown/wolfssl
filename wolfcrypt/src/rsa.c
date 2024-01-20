@@ -2710,7 +2710,7 @@ static int RsaFunctionSync(const byte* in, word32 inLen, byte* out,
     #endif
         case RSA_PUBLIC_ENCRYPT:
         case RSA_PUBLIC_DECRYPT:
-            if (mp_exptmod_nct(tmp, &key->e, &key->n, tmp) != MP_OKAY)
+            if (mp_exptmod(tmp, &key->e, &key->n, tmp) != MP_OKAY)
                 ret = MP_EXPTMOD_E;
             break;
         default:
